@@ -188,19 +188,19 @@ public class SideNavigation extends VBox {
         return btn;
     }
 
-    /* * Helper to create the toggle button (Inventory).
+    /** Helper to create the toggle button (Inventory).
      * It combines the main icon with an arrow toggle indicator.
      * @param toggleIcon The FontIcon instance used for the angle indicator.
      */
     private Button createToggleNavButton(String text, Ikon mainIconCode, FontIcon toggleIcon) {
         Button btn = new Button(text);
 
-        // 1. Main Icon
+        // Main Icon
         FontIcon mainIcon = new FontIcon(mainIconCode);
         mainIcon.setIconSize(20);
         mainIcon.getStyleClass().add("nav-icon");
 
-        // 2. Toggle Icon
+        // Toggle Icon
         toggleIcon.setIconSize(14);
         toggleIcon.getStyleClass().add("nav-icon-toggle");
 

@@ -21,28 +21,39 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
+            // Removes Standard Title Bar
             primaryStage.initStyle(StageStyle.UNDECORATED);
 
             RootLayout rootLayout;
             BorderPane loginWrapper;
 
+            // Custom Title Bar
+            CustomTitleBar customTitleBar = new CustomTitleBar(primaryStage);
+
+            // Static UserSession/TimerService
+            UserSession.initialize(customTitleBar);
+
             Runnable onLogout = () -> {
+                // Ensure the timer is stopped and reset when logging out
+                UserSession.logout();
 
                 LoginView newLoginView = new LoginView(primaryStage, null);
 
                 BorderPane newLoginWrapper = new BorderPane();
-                newLoginWrapper.setTop(new CustomTitleBar(primaryStage));
+                // Use the single CustomTitleBar instance for the new login screen
+                newLoginWrapper.setTop(customTitleBar);
                 newLoginWrapper.setCenter(newLoginView);
 
                 primaryStage.getScene().setRoot(newLoginWrapper);
                 primaryStage.setTitle("Wigell Camping - Login");
             };
 
-            rootLayout = new RootLayout(primaryStage, onLogout);
+            rootLayout = new RootLayout(primaryStage, onLogout, customTitleBar);
+            // The LoginView gets the RootLayout instance it will switch to
             LoginView loginView = new LoginView(primaryStage, rootLayout);
 
             loginWrapper = new BorderPane();
-            loginWrapper.setTop(new CustomTitleBar(primaryStage));
+            loginWrapper.setTop(customTitleBar);
             loginWrapper.setCenter(loginView);
             loginWrapper.getStyleClass().add("login-wrapper");
 

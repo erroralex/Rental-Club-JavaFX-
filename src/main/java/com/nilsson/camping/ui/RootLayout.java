@@ -13,20 +13,17 @@ import javafx.stage.Stage;
 public class RootLayout extends BorderPane {
 
     /**
-     * Constructor requires the main Stage reference and a logout callback.
+     * Constructor requires the main Stage reference, a logout callback, and the pre-initialized CustomTitleBar.
      * @param stage The main application Stage.
      * @param onLogout The Runnable to execute to switch back to the login screen.
+     * @param titleBar The single, initialized CustomTitleBar instance.
      */
-    public RootLayout(Stage stage, Runnable onLogout) {
+    public RootLayout(Stage stage, Runnable onLogout, CustomTitleBar titleBar) {
         // Apply the CSS class
         this.getStyleClass().add("root-layout");
 
-        // Custom Title Bar (TOP)
-        CustomTitleBar titleBar = new CustomTitleBar(stage);
-        this.setTop(titleBar);
-
         // Side Navigation (LEFT)
-        SideNavigation sideNav = new SideNavigation(this, stage, onLogout); // UPDATED
+        SideNavigation sideNav = new SideNavigation(this, stage, onLogout);
         this.setLeft(sideNav);
 
         // Styling for the navigation width

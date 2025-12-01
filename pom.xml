@@ -13,7 +13,6 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <!-- FIX: Downgrade Ikonli version for Java 8 compatibility (version 2.4.0 uses class file version 52.0) -->
         <ikonli.version>2.4.0</ikonli.version>
         <jackson.version>2.15.2</jackson.version>
     </properties>

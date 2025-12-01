@@ -16,19 +16,41 @@ public class CustomTitleBar extends HBox {
     private double xOffset = 0;
     private double yOffset = 0;
 
+    // Timer components
+    public Label timeDisplayLabel = new Label("00:00:00");
+    private Label prefixLabel = new Label("Session Timer: ");
+    private HBox timerContainer;
+
     public CustomTitleBar(Stage stage) {
 
         // Apply CSS class
         this.getStyleClass().add("custom-title-bar");
         this.setAlignment(Pos.CENTER_LEFT);
 
-        // Application Title
+        // Application Title (Aligned Left)
         Label titleLabel = new Label("Wigell Camping Admin Portal");
-        titleLabel.getStyleClass().add("title-label"); // CSS class for golden color applied here
+        titleLabel.getStyleClass().add("title-label");
 
         // HBox spacer to push window controls to the right
-        HBox spacer = new HBox();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox leftSpacer = new HBox();
+        HBox.setHgrow(leftSpacer, Priority.ALWAYS);
+
+        // Session Timer Container (Aligned Center)
+        prefixLabel.getStyleClass().add("timer-prefix"); // Optional CSS class
+        timeDisplayLabel.getStyleClass().add("timer");
+
+        timerContainer = new HBox(5, prefixLabel, timeDisplayLabel);
+        timerContainer.setAlignment(Pos.CENTER);
+        timerContainer.setMaxWidth(Double.MAX_VALUE);
+
+        // Initially hide and unmanage the timer container
+        timerContainer.setVisible(false);
+        timerContainer.setManaged(false);
+
+
+        // HBox spacer to balance the layout and push window controls to the right
+        HBox rightSpacer = new HBox();
+        HBox.setHgrow(rightSpacer, Priority.ALWAYS);
 
         // Window Controls (Buttons)
         Button minimizeBtn = new Button("—");
@@ -39,11 +61,10 @@ public class CustomTitleBar extends HBox {
         closeBtn.getStyleClass().addAll("window-button", "window-close");
         closeBtn.setOnAction(e -> stage.close());
 
-        // Add components
-        this.getChildren().addAll(titleLabel, spacer, minimizeBtn, closeBtn);
+        // Add components: Title | Left Spacer | Timer Container (Centered) | Right Spacer | Controls
+        this.getChildren().addAll(titleLabel, leftSpacer, timerContainer, rightSpacer, minimizeBtn, closeBtn);
 
-        // Window Dragging Logic
-        // Record mouse press location
+        // Window Dragging Logic with record mouse press location
         this.setOnMousePressed(event -> {
             xOffset = event.getSceneX();
             yOffset = event.getSceneY();
@@ -53,6 +74,18 @@ public class CustomTitleBar extends HBox {
         this.setOnMouseDragged(event -> {
             stage.setX(event.getScreenX() - xOffset);
             stage.setY(event.getScreenY() - yOffset);
+        });
+    }
+
+    /**
+     * Toggles the visibility of the session timer container.
+     * @param visible true to show the timer, false to hide it.
+     */
+    public void setTimerVisible(boolean visible) {
+        // Must be run on the JavaFX application thread
+        javafx.application.Platform.runLater(() -> {
+            timerContainer.setVisible(visible);
+            timerContainer.setManaged(visible);
         });
     }
 }

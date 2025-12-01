@@ -8,6 +8,7 @@ import java.util.*;
 public class MemberRegistry {
 
     private List<Member> membersList = new ArrayList<>();
+    // Tracks all used IDs for fast lookup and unique ID generation
     private Set<Integer> usedIDs = new HashSet<>();
 
     private MemberRegistry() {
@@ -23,7 +24,10 @@ public class MemberRegistry {
         private static final MemberRegistry INSTANCE = new MemberRegistry();
     }
 
-    // Generates a unique 4-digit ID between 1000 and 9999.
+    /**
+     * Generates a unique 4-digit ID between 1000 and 9999.
+     * @return A unique 4-digit integer ID.
+     */
     public int getUniqueID() {
         Random random = new Random();
 
@@ -39,10 +43,42 @@ public class MemberRegistry {
         return membersList;
     }
 
+    /**
+     * Adds a new member to the registry and updates the used ID set.
+     * Persistence (saving to file) should ideally happen here or be triggered from the service.
+     * @param member The member to add.
+     */
     public void addMember(Member member) {
         membersList.add(member);
         // Ensure the ID of the new member is registered as used
         usedIDs.add(member.getId());
+        DataHandler.saveMembers(this.membersList);
+    }
+
+    /**
+     * Removes a specified Member object from the in-memory list and
+     * updates the used IDs set. Triggers persistence of the change.
+     * * This method fulfills the requirement for the MembershipService.
+     * * @param member The Member object to remove.
+     * @return true if the member was present and successfully removed, false otherwise.
+     */
+    public boolean removeMember(Member member) {
+        if (member == null) {
+            return false;
+        }
+
+        // Remove the member from the in-memory List
+        boolean wasRemoved = this.membersList.remove(member);
+
+        if (wasRemoved) {
+            // Remove the ID from the usedIDs set, freeing it up for future use
+            usedIDs.remove(member.getId());
+
+            // Save Changes
+            DataHandler.saveMembers(this.membersList);
+        }
+
+        return wasRemoved;
     }
 
     // Loads members using the DataHandler and populates the registry and usedIDs set.

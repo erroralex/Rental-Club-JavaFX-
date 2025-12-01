@@ -2,41 +2,48 @@ package com.nilsson.camping.data;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nilsson.camping.model.Member;
 import com.nilsson.camping.model.items.Gear;
 import com.nilsson.camping.model.items.RecreationalVehicle;
 
-import java.io.InputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Handles persistent data operations, specifically loading and saving data
- * from/to JSON files using the Jackson library.
- */
+// Handles persistent data operations using the Jackson library.
 public class DataHandler {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final String MEMBERS_FILE = "/members.json";
-    private static final String VEHICLES_FILE = "/vehicles.json";
-    private static final String GEAR_FILE = "/gear.json";
+    private static final ObjectMapper MAPPER = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
-    // Loads the list of members from the JSON file located in the resources folder
+    // Absolute File Paths
+    private static final String MEMBERS_PERSISTENCE_PATH =
+            System.getProperty("user.dir") + "/src/main/resources/data/json/members.json";
+
+    private static final String VEHICLES_PERSISTENCE_PATH =
+            System.getProperty("user.dir") + "/src/main/resources/data/json/vehicles.json";
+
+    private static final String GEAR_PERSISTENCE_PATH =
+            System.getProperty("user.dir") + "/src/main/resources/data/json/gear.json";
+
+    // ──────────────────────────────────────────────────────
+    // Member Operations
+    // ──────────────────────────────────────────────────────
+
+    // Load Members
     public static List<Member> loadMembers() {
-
+        File file = new File(MEMBERS_PERSISTENCE_PATH);
         List<Member> members = new ArrayList<>();
-        try (InputStream is = DataHandler.class.getResourceAsStream(MEMBERS_FILE)) {
 
-            if (is == null) {
-                System.err.println("ERROR: Resource file not found: " + MEMBERS_FILE + ". Ensure it's in the resources folder.");
-                // Return empty list if file is missing
-                return members;
-            }
+        if (!file.exists() || file.length() == 0) {
+            System.out.println("INFO: Members file not found or is empty at " + MEMBERS_PERSISTENCE_PATH + ". Starting with empty list.");
+            return members;
+        }
 
-            members = MAPPER.readValue(is, new TypeReference<List<Member>>() {
-            });
-            System.out.println("Successfully loaded " + members.size() + " members from " + MEMBERS_FILE);
+        try {
+            members = MAPPER.readValue(file, new TypeReference<List<Member>>() {});
+            System.out.println("Successfully loaded " + members.size() + " members from " + MEMBERS_PERSISTENCE_PATH);
 
         } catch (IOException e) {
             System.err.println("FATAL ERROR: Could not load members data from JSON: " + e.getMessage());
@@ -46,51 +53,97 @@ public class DataHandler {
         return members;
     }
 
-    // Loads the list of vehicles from the JSON file located in the resources folder
-    public static List<RecreationalVehicle> loadRecreationalVehicles() {
-
-        List<RecreationalVehicle> recreationalVehicles = new ArrayList<>();
-        try (InputStream is = DataHandler.class.getResourceAsStream(VEHICLES_FILE)) {
-
-            if (is == null) {
-                System.err.println("ERROR: Resource file not found: " + VEHICLES_FILE + ". Ensure it's in the resources folder.");
-                // Return empty list if file is missing
-                return recreationalVehicles;
-            }
-
-            recreationalVehicles = MAPPER.readValue(is, new TypeReference<List<RecreationalVehicle>>() {
-            });
-            System.out.println("Successfully loaded " + recreationalVehicles.size() + " vehicles from " + VEHICLES_FILE);
+    // Save Members
+    public static void saveMembers(List<Member> members) {
+        try {
+            File file = new File(MEMBERS_PERSISTENCE_PATH);
+            file.getParentFile().mkdirs();
+            MAPPER.writeValue(file, members);
+            System.out.println("Successfully saved " + members.size() + " members to " + MEMBERS_PERSISTENCE_PATH);
 
         } catch (IOException e) {
-            System.err.println("FATAL ERROR: Could not load members data from JSON: " + e.getMessage());
+            System.err.println("FATAL ERROR: Could not save members data to JSON: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // ──────────────────────────────────────────────────────
+    // Vehicle Operations
+    // ──────────────────────────────────────────────────────
+
+    // Load Vehicles
+    public static List<RecreationalVehicle> loadRecreationalVehicles() {
+        File file = new File(VEHICLES_PERSISTENCE_PATH);
+        List<RecreationalVehicle> recreationalVehicles = new ArrayList<>();
+
+        if (!file.exists() || file.length() == 0) {
+            System.out.println("INFO: Vehicles file not found or is empty at " + VEHICLES_PERSISTENCE_PATH + ". Starting with empty list.");
+            return recreationalVehicles;
+        }
+
+        try {
+            recreationalVehicles = MAPPER.readValue(file, new TypeReference<List<RecreationalVehicle>>() {});
+            System.out.println("Successfully loaded " + recreationalVehicles.size() + " vehicles from " + VEHICLES_PERSISTENCE_PATH);
+
+        } catch (IOException e) {
+            System.err.println("FATAL ERROR: Could not load vehicle data from JSON: " + e.getMessage());
             e.printStackTrace();
         }
 
         return recreationalVehicles;
     }
 
-    // Loads the list of gear from the JSON file located in the resources folder
-    public static List<Gear> loadGear() {
-
-        List<Gear> gear = new ArrayList<>();
-        try (InputStream is = DataHandler.class.getResourceAsStream(GEAR_FILE)) {
-
-            if (is == null) {
-                System.err.println("ERROR: Resource file not found: " + GEAR_FILE + ". Ensure it's in the resources folder.");
-                // Return empty list if file is missing
-                return gear;
-            }
-
-            gear = MAPPER.readValue(is, new TypeReference<List<Gear>>() {
-            });
-            System.out.println("Successfully loaded " + gear.size() + " items from " + GEAR_FILE);
+    // Save Vehicles
+    public static void saveRecreationalVehicle(List<RecreationalVehicle> recreationalVehicles) {
+        try {
+            File file = new File(VEHICLES_PERSISTENCE_PATH);
+            file.getParentFile().mkdirs();
+            MAPPER.writeValue(file, recreationalVehicles);
+            System.out.println("Successfully saved " + recreationalVehicles.size() + " vehicles to " + VEHICLES_PERSISTENCE_PATH);
 
         } catch (IOException e) {
-            System.err.println("FATAL ERROR: Could not load members data from JSON: " + e.getMessage());
+            System.err.println("FATAL ERROR: Could not save vehicle data to JSON: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // ──────────────────────────────────────────────────────
+    // Gear Operations
+    // ──────────────────────────────────────────────────────
+
+    // Load Gear
+    public static List<Gear> loadGear() {
+        File file = new File(GEAR_PERSISTENCE_PATH);
+        List<Gear> gear = new ArrayList<>();
+
+        if (!file.exists() || file.length() == 0) {
+            System.out.println("INFO: Gear file not found or is empty at " + GEAR_PERSISTENCE_PATH + ". Starting with empty list.");
+            return gear;
+        }
+
+        try {
+            gear = MAPPER.readValue(file, new TypeReference<List<Gear>>() {});
+            System.out.println("Successfully loaded " + gear.size() + " items from " + GEAR_PERSISTENCE_PATH);
+
+        } catch (IOException e) {
+            System.err.println("FATAL ERROR: Could not load gear data from JSON: " + e.getMessage());
             e.printStackTrace();
         }
 
         return gear;
+    }
+
+    // Save Gear
+    public static void saveGear(List<Gear> gears) {
+        try {
+            File file = new File(GEAR_PERSISTENCE_PATH);
+            file.getParentFile().mkdirs();
+            MAPPER.writeValue(file, gears);
+            System.out.println("Successfully saved " + gears.size() + " gear to " + GEAR_PERSISTENCE_PATH);
+
+        } catch (IOException e) {
+            System.err.println("FATAL ERROR: Could not save gear data to JSON: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
