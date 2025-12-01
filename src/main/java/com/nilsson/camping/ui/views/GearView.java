@@ -1,8 +1,8 @@
 package com.nilsson.camping.ui.views;
 
 import com.nilsson.camping.model.items.Gear;
-import com.nilsson.camping.model.items.Vehicle;
 import com.nilsson.camping.model.registries.Inventory;
+import com.nilsson.camping.service.InventoryService;
 import com.nilsson.camping.ui.UIUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,6 +23,7 @@ public class GearView extends VBox {
 
     private final TableView<Gear> gearTable = new TableView<>();
     private final ObservableList<Gear> gearData = FXCollections.observableArrayList();
+    private final InventoryService inventoryService = new InventoryService();
 
     public GearView() {
 
@@ -81,6 +82,51 @@ public class GearView extends VBox {
         gearData.addAll(gear);
     }
 
+    private void handleAddGear() {
+        Gear newGear = inventoryService.handleAddGear();
+
+        if (newGear != null) {
+            gearData.add(newGear);
+        }
+    }
+
+    private void handleEditGear() {
+        Gear selectedGear = gearTable.getSelectionModel().getSelectedItem();
+        if (selectedGear != null) {
+            UIUtil.showInfoAlert("Edit Gear", "Functionality Pending",
+                    "A dialog/form for editing item " + selectedGear.getModel() + " will be implemented here.");
+        } else {
+            UIUtil.showErrorAlert("No Item Selected", "Selection Required",
+                    "Please select a iem from the table to edit.");
+        }
+    }
+
+    private void handleRemoveGear() {
+        Gear selectedGear = gearTable.getSelectionModel().getSelectedItem();
+
+        if (selectedGear == null) {
+            UIUtil.showErrorAlert("No Item Selected", "Selection Required",
+                    "Please select a item from the table to remove.");
+            return;
+        }
+
+        // Confirmation dialog
+        boolean confirmed = UIUtil.showConfirmationAlert("Confirm Removal",
+                "Are you sure?",
+                "Do you want to permanently remove " + selectedGear.getModel() + "?");
+
+        if (confirmed) {
+            boolean wasRemovedFromRegistry = inventoryService.handleRemoveGear(selectedGear);
+
+            if (wasRemovedFromRegistry) {
+                gearData.remove(selectedGear);
+            } else {
+                UIUtil.showErrorAlert("Removal Failed", "Operation Error",
+                        "The item could not be removed from the registry.");
+            }
+        }
+    }
+
     // Create a container for Add, Edit, and Remove buttons
     private HBox createButtonBar() {
 
@@ -99,40 +145,5 @@ public class GearView extends VBox {
         HBox buttonBar = new HBox(10, btnAdd, btnEdit, btnRemove);
         buttonBar.setAlignment(Pos.CENTER_LEFT);
         return buttonBar;
-    }
-// ------------------------------------------------------------------------------------------------------------------
-    // --- Action Handlers (Placeholder Logic) ---
-
-    private void handleAddGear() {
-        UIUtil.showInfoAlert("Add Member", "Functionality Pending",
-                "A dialog/form for adding a new member will be implemented here.");
-    }
-
-    private void handleEditGear() {
-        Gear selectedGear = gearTable.getSelectionModel().getSelectedItem();
-        if (selectedGear != null) {
-            UIUtil.showInfoAlert("Edit Vehicle", "Functionality Pending",
-                    "A dialog/form for editing vehicle " + selectedGear.getModel() + " will be implemented here.");
-        } else {
-            UIUtil.showErrorAlert("No Vehicle Selected", "Selection Required",
-                    "Please select a vehicle from the table to edit.");
-        }
-    }
-
-    private void handleRemoveGear() {
-        Gear selectedGear = gearTable.getSelectionModel().getSelectedItem();
-        if (selectedGear != null) {
-            // In a real app, this would require confirmation and calling the registry service.
-            boolean confirmed = true; // Placeholder for a confirmation dialog
-            if (confirmed) {
-                // Remove from registry and refresh table (Placeholder, actual service call needed)
-                gearTable.getItems().remove(selectedGear);
-                UIUtil.showInfoAlert("Vehicle Removed", "Success"," " + selectedGear.getModel() + " has been removed.");
-                // Note: Actual removal from MemberRegistry object is required in a complete implementation.
-            }
-        } else {
-            UIUtil.showErrorAlert("No Member Selected", "Selection Required",
-                    "Please select a member from the table to remove.");
-        }
     }
 }

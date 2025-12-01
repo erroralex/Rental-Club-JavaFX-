@@ -9,9 +9,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.Region;
-
+import javafx.scene.control.ButtonType;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Optional;
 
 /**
  * Utility class for common UI operations, such as displaying standard alerts
@@ -21,9 +22,7 @@ public class UIUtil {
 
     private static final String CSS_PATH = "/dark-theme.css";
 
-    /**
-     * Helper method to apply the custom dark theme to any Alert dialog.
-     */
+    // Helper method to apply the custom dark theme to any Alert dialog.
     private static void applyTheme(Alert alert) {
         try {
             // Applies CSS file to the dialog's root container (DialogPane)
@@ -38,7 +37,7 @@ public class UIUtil {
 
     /**
      * Shows a standard error alert dialog to the user.
-     *
+     * *
      * @param title The title of the alert window.
      * @param header The header text (main message).
      * @param content The detailed content message.
@@ -117,6 +116,30 @@ public class UIUtil {
     }
 
     /**
+     * Shows a confirmation dialog with OK and Cancel options.
+     *
+     * @param title The title of the alert window.
+     * @param header The header text (main message).
+     * @param content The detailed content message.
+     * @return true if the user clicks OK, false if the user clicks Cancel or closes the dialog.
+     */
+    public static boolean showConfirmationAlert(String title, String header, String content) {
+        // Create an alert with the Confirmation type
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+
+        applyTheme(alert);
+
+        // Show the alert and wait for a response
+        Optional<ButtonType> result = alert.showAndWait();
+
+        // Check if the result matches the OK button
+        return result.isPresent() && result.get() == ButtonType.OK;
+    }
+
+    /**
      * Creates an HBox layout that pushes the main graphic (like a FontIcon) and the toggle icon
      * to the opposite sides of the button text space.
      * @param mainGraphic The main icon.
@@ -132,7 +155,7 @@ public class UIUtil {
         HBox container = new HBox(mainGraphic, spacer, toggleGraphic);
 
         container.setMaxWidth(Double.MAX_VALUE);
-        container.setSpacing(5); // Small gap between main icon and toggle icon
+        container.setSpacing(5);
 
         return container;
     }

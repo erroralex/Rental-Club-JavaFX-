@@ -42,10 +42,12 @@ public class Inventory {
 
     public void addRecreationalVehicle(RecreationalVehicle rv) {
         this.recreationalVehicleList.add(rv);
+        DataHandler.saveRecreationalVehicle(this.recreationalVehicleList);
     }
 
     public void addGear(Gear gear) {
         this.gearList.add(gear);
+        DataHandler.saveGear(this.gearList);
     }
 
     public List<Vehicle> getVehicleList() {
@@ -57,9 +59,28 @@ public class Inventory {
         this.recreationalVehicleList = DataHandler.loadRecreationalVehicles();
     }
 
-    // Loads gear using the DataHandler and populates the gear list.
     private void loadGearFromDataHandler() {
         List<Gear> loadedGear = DataHandler.loadGear();
         this.gearList = new ArrayList<>(loadedGear);
+    }
+
+    public boolean removeRecreationalVehicle(RecreationalVehicle rv) {
+        boolean wasRemoved = this.recreationalVehicleList.remove(rv);
+
+        if(wasRemoved) {
+            DataHandler.saveRecreationalVehicle(this.recreationalVehicleList);
+        }
+        return wasRemoved;
+    }
+
+    public boolean removeGear(Gear gear) {
+        // Call List.remove(), which returns true if the element was removed.
+        boolean wasRemoved = this.gearList.remove(gear);
+
+        if (wasRemoved) {
+            DataHandler.saveGear(this.gearList);
+        }
+
+        return wasRemoved;
     }
 }

@@ -10,7 +10,7 @@ public class Gear extends Item {
 
     }
 
-    public Gear(String model, double dailyPrice, String capacity) {
+    public Gear(String model, String type, String capacity, double dailyPrice) {
         super(dailyPrice);
         this.model = model;
         this.type = type;

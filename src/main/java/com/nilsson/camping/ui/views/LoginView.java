@@ -18,6 +18,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import org.kordamp.ikonli.Ikon;
 import javafx.scene.layout.AnchorPane;
+import com.nilsson.camping.ui.CustomTitleBar;
+import javafx.scene.layout.Pane;
 
 /**
  * The initial screen of the application, used for user authentication.
@@ -41,17 +43,17 @@ public class LoginView extends VBox {
         Label logo = new Label();
         Image logoImage = null;
         try {
-            // Load the status image resource
+            // Load the logo image resource
             logoImage = new Image(getClass().getResource("/logo.png").toExternalForm());
         } catch (Exception e) {
             System.err.println("Error loading status image: " + "/logo.png" + ". Using text placeholder.");
         }
 
         if (logoImage != null) {
-            ImageView statusImageView = new ImageView(logoImage);
-            statusImageView.setFitWidth(600);
-            statusImageView.setPreserveRatio(true);
-            logo.setGraphic(statusImageView);
+            ImageView logoImageView = new ImageView(logoImage);
+            logoImageView.setFitWidth(600);
+            logoImageView.setPreserveRatio(true);
+            logo.setGraphic(logoImageView);
         } else {
             // Fallback text if image fails to load
             logo.setText("Wigell Camping");
@@ -133,7 +135,22 @@ public class LoginView extends VBox {
 
                 // Only switch if rootLayout is provided (i.e., this is the initial login)
                 if (rootLayout != null) {
+                    CustomTitleBar sharedTitleBar = UserSession.getInitializedTitleBar();
+
+                    // 1. Detach the title bar from its current parent (the loginWrapper BorderPane)
+                    if (sharedTitleBar != null && sharedTitleBar.getParent() != null) {
+                        // We use the generic Pane type to ensure we can call getChildren()
+                        ((Pane) sharedTitleBar.getParent()).getChildren().remove(sharedTitleBar);
+                    }
+
+                    // 2. FIX: Manually re-attach the title bar to the RootLayout instance
+                    if (rootLayout.getTop() == null) {
+                        rootLayout.setTop(sharedTitleBar);
+                    }
+
+                    // 3. Swap the scene root
                     primaryStage.getScene().setRoot(rootLayout);
+
                     // Updated title as requested
                     primaryStage.setTitle("Wigell Camping - Home");
                 }
