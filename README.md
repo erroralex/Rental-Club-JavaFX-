@@ -5,6 +5,16 @@
 The application is built using **Pure JavaFX** (No FXML) with a focus on Object-Oriented Design principles and layered architecture.
 
 ---
+## Screenshots
+![Login View](src/main/java/com/nilsson/camping/screenshots/screenshot_login.png)
+
+![UI View](src/main/java/com/nilsson/camping/screenshots/screenshot_ui.png)
+
+![Profits View](src/main/java/com/nilsson/camping/screenshots/screenshot_profits.png)
+
+![Light-mode](src/main/java/com/nilsson/camping/screenshots/screenshot_lightmode.png)
+
+---
 
 ## ✨ Key Features
 
